@@ -38,7 +38,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-String temp = "test input";
+String temp = "what is up"; //nzoq hnqww
 
 char[] tempArray = temp.toCharArray();
 
@@ -49,16 +49,21 @@ use a string split here and break whole user input into chars then loop it and i
  */
         char[] encrypted =new char[tempArray.length];
         for (int i = 0; i<tempArray.length; i++){
-            encrypted[i] = ascii_encryption(tempArray[i], encryptionarray);
+            if (tempArray[i] !=  ' ')
+            {
+                encrypted[i] = ascii_encryption(tempArray[i], encryptionarray);
+            }
+            else encrypted[i] = ' ';
             encryptionarray[0] = encryptionarray[0]+1;
+            
         }
-            //char encrypted = ascii_encryption(temp, encryption1, encryption2, encryption3);
-        for (int i=0; i<encrypted.length; i++){
+            //char encrypted = ascii_encryption(temp, encryption1, encryption2, encryption3); ---> // ANDYLE_5_22_25 After implementing a space adder function into encryption.
+        /*for (int i=0; i<encrypted.length; i++){                                                  // I dont think we need this anymore and can be deleted. Code functions fine without it.
             boolean testVar = Character.isDigit(encrypted[i]);
             if (testVar){
                 encrypted[i] = ' ';
             }
-        }
+        }*/
         String finalEncrypt = String.valueOf(encrypted);
 
         System.out.printf("The test input was %s and the encrypted char is %s", temp, finalEncrypt);
