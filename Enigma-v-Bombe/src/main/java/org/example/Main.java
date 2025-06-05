@@ -40,15 +40,18 @@ public class Main {
                         ")");
 
         // Insert some default mappings (run once)
-        String[][] defaultMappings = {
-                {"A", "Q"}, {"B", "F"}, {"C", "L"}, {"D", "M"}, {"E", "P"},
-                {"W", "G"}, {"H", "U"}, {"I", "V"}, {"T", "Z"}
+        String[][] GearA = {
+                {"1", "15"}, {"2", "18"}, {"3", "5"}, {"4", "11"}, {"5", "9"},
+                {"6", "7"}, {"7", "2"}, {"8", "4"}, {"9", "3"}, {"10", "20"},
+                {"11", "4"}, {"12", "1"}, {"13", "17"}, {"14", "4"},  {"15", "11"},
+                {"16", "2"}, {"17", "18"}, {"18", "44"}, {"19", "7"}, {"20", "31"},
+                {"21", "7"}, {"22", "1"}, {"23", "52"}, {"24", "3"}, {"25", "2"}, {"26", "2"}
         };
 
         try (PreparedStatement stmt = conn.prepareStatement(
                 "INSERT OR IGNORE INTO rotor_mappings VALUES (?, ?)")) {
 
-            for (String[] mapping : defaultMappings) {
+            for (String[] mapping : GearA) {
                 stmt.setString(1, mapping[0]);
                 stmt.setString(2, mapping[1]);
                 stmt.executeUpdate();
