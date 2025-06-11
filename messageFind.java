@@ -2,12 +2,18 @@ public class messageFind {
     public int findMessage(char[] enigmaArray, char[] guessMessage) {
         int count = 0; 
         
-        for(char letter : enigmaArray){
-            for(char guess : guessMessage){
-                if (letter != guess){
-                    count++; 
+        for (int i = 0; i <= enigmaArray.length - guessMessage.length; i++) {
+            boolean hasCommonChar = false; 
+
+            for (int j = 0; j < guessMessage.length; j++) {
+                if (enigmaArray[i + j] == guessMessage[j]) {
+                    hasCommonChar = true; 
+                    break; 
                 }
             }
+            if (hasCommonChar) {
+                count++; 
+            } 
         }
 
         return count;
