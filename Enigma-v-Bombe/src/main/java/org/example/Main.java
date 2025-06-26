@@ -1,12 +1,14 @@
 package org.example;
 import java.sql.*;
+import java.util.Scanner;
 
 public class Main {
 
     // Database method to get mapped character
-    public static char getMappedChar(char input, Connection conn) throws SQLException {
+    public static char getMappedChar(char input, Connection conn, String gear) throws SQLException {
+        String tableName = "rotor_mappings_" + gear;
         try (PreparedStatement stmt = conn.prepareStatement(
-                "SELECT output_char FROM rotor_mappings WHERE input_char = ?")) {
+                "SELECT output_char FROM " + tableName + " WHERE input_char = ?")) {
 
             stmt.setString(1, String.valueOf(Character.toUpperCase(input)));
             ResultSet rs = stmt.executeQuery();
@@ -16,9 +18,9 @@ public class Main {
     }
 
     // Updated encryption method with database lookup
-    public static char ascii_encryption(char input_letter, int[] encryption_code, Connection conn) throws SQLException {
+    public static char ascii_encryption(char input_letter, int[] encryption_code, Connection conn, String gear) throws SQLException {
         // 1. Get database mapping (e.g., a→q)
-        char mappedChar = getMappedChar(input_letter, conn);
+        char mappedChar = getMappedChar(input_letter, conn, gear);
 
         // 2. Apply numeric encryption
         int encrypted = (int) mappedChar;
@@ -34,14 +36,24 @@ public class Main {
     public static void initializeMappings(Connection conn) throws SQLException {
         // Create table if not exists
         conn.createStatement().execute(
-                "CREATE TABLE IF NOT EXISTS rotor_mappings (" +
+                "CREATE TABLE IF NOT EXISTS rotor_mappings_gearA (" +
                         "  input_char CHAR PRIMARY KEY," +
                         "  output_char CHAR NOT NULL" +
+                        ")");
+        conn.createStatement().execute(
+                "CREATE TABLE IF NOT EXISTS rotor_mappings_gearB (" +
+                        "  input_charB CHAR PRIMARY KEY," +
+                        "  output_charB CHAR NOT NULL" +
+                        ")");
+        conn.createStatement().execute(
+                "CREATE TABLE IF NOT EXISTS rotor_mappings_gearC (" +
+                        "  input_charB CHAR PRIMARY KEY," +
+                        "  output_charB CHAR NOT NULL" +
                         ")");
 
         // Insert some default mappings (run once)
         String[][] GearA = {
-                {"1", "15"}, {"2", "18"}, {"3", "5"}, {"4", "11"}, {"5", "9"},
+                {"1", "16"}, {"2", "18"}, {"3", "5"}, {"4", "11"}, {"5", "9"},
                 {"6", "7"}, {"7", "2"}, {"8", "4"}, {"9", "3"}, {"10", "20"},
                 {"11", "4"}, {"12", "1"}, {"13", "17"}, {"14", "4"},  {"15", "11"},
                 {"16", "2"}, {"17", "18"}, {"18", "44"}, {"19", "7"}, {"20", "31"},
@@ -49,7 +61,7 @@ public class Main {
         };
 
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT OR IGNORE INTO rotor_mappings VALUES (?, ?)")) {
+                "INSERT OR IGNORE INTO rotor_mappings_gearA VALUES (?, ?)")) {
 
             for (String[] mapping : GearA) {
                 stmt.setString(1, mapping[0]);
@@ -57,10 +69,49 @@ public class Main {
                 stmt.executeUpdate();
             }
         }
+
+
+        String[][] GearB = {
+                {"1", "9"}, {"2", "11"}, {"3", "4"}, {"4", "7"}, {"5", "6"},
+                {"6", "5"}, {"7", "2"}, {"8", "3"}, {"9", "14"}, {"10", "12"},
+                {"11", "19"}, {"12", "15"}, {"13", "17"}, {"14", "13"},  {"15", "1"},
+                {"16", "43"}, {"17", "22"}, {"18", "31"}, {"19", "26"}, {"20", "37"},
+                {"21", "24"}, {"22", "16"}, {"23", "34"}, {"24", "42"}, {"25", "54"}, {"26", "39"}
+        };
+
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "INSERT OR IGNORE INTO rotor_mappings_gearB VALUES (?, ?)")) {
+
+            for (String[] mapping : GearB) {
+                stmt.setString(1, mapping[0]);
+                stmt.setString(2, mapping[1]);
+                stmt.executeUpdate();
+            }
+        }
+
+        String[][] GearC = {
+                {"1", "6"}, {"2", "1"}, {"3", "64"}, {"4", "21"}, {"5", "17"},
+                {"6", "21"}, {"7", "28"}, {"8", "6"}, {"9", "9"}, {"10", "7"},
+                {"11", "8"}, {"12", "4"}, {"13", "13"}, {"14", "15"},  {"15", "14"},
+                {"16", "13"}, {"17", "6"}, {"18", "3"}, {"19", "26"}, {"20", "13"},
+                {"21", "2"}, {"22", "18"}, {"23", "4"}, {"24", "2"}, {"25", "10"}, {"26", "20"}
+        };
+
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "INSERT OR IGNORE INTO rotor_mappings_gearC VALUES (?, ?)")) {
+
+            for (String[] mapping : GearC) {
+                stmt.setString(1, mapping[0]);
+                stmt.setString(2, mapping[1]);
+                stmt.executeUpdate();
+            }
+        }
+
+
     }
 
     public static void main(String[] args) {
-        String url = "jdbc:sqlite:my_database.db";
+        String url = "jdbc:sqlite:my_databaseB.db";
 
         // Load JDBC driver
         try {
@@ -71,9 +122,22 @@ public class Main {
             return;
         }
 
-        String temp = "what is up";
+        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+        System.out.println("Enter the message to be encoded:");
+        String temp = myObj.nextLine();  // Read user input
+
+
         char[] tempArray = temp.toCharArray();
-        int[] encryptionarray = {2, 9, 5};
+        int tempPosA = 1;
+        int tempPosB = 1;
+        int tempPosC = 1;
+
+        int positionA = 3;
+        int positionB = 9;
+        int positionC = 20;
+
+        int[] encryptionarray = {positionA, positionB, positionC};
+
         char[] encrypted = new char[tempArray.length];
 
         try (Connection conn = DriverManager.getConnection(url)) {
@@ -83,9 +147,13 @@ public class Main {
             initializeMappings(conn);
 
             // Encrypt using database mappings
+            boolean useGearA = true;
             for (int i = 0; i < tempArray.length; i++) {
                 if (tempArray[i] != ' ') {
-                    encrypted[i] = ascii_encryption(tempArray[i], encryptionarray, conn);
+
+                    String currentGear = useGearA ? "rotor_mappings_gearA" : "rotor_mappings_gearB";
+                    encrypted[i] = ascii_encryption(tempArray[i], encryptionarray, conn, currentGear);
+
                 } else {
                     encrypted[i] = ' ';
                 }
@@ -94,9 +162,11 @@ public class Main {
 
             // Debug: Print all mappings
             System.out.println("\nCurrent Mappings:");
-            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM rotor_mappings");
+            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM rotor_mappings_gearA");
+
             while (rs.next()) {
                 System.out.println(rs.getString("input_char") + " → " + rs.getString("output_char"));
+
             }
 
         } catch (SQLException e) {
