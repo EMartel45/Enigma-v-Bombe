@@ -112,14 +112,28 @@ public class ManualWheelAndPegBoard extends JPanel implements MouseListener {
 
         g2D.setPaint(Color.BLACK);
         g2D.setFont(new Font("Arial", Font.BOLD, 36));
-        g2D.drawString(String.valueOf(wheel1), 135, 200);
-        g2D.drawString(String.valueOf(wheel2), 285, 200);
-        g2D.drawString(String.valueOf(wheel3), 435, 200);
+        FontMetrics fm = g2D.getFontMetrics();
+
+// Draw wheel1 centered
+        String w1 = String.valueOf(wheel1);
+        int w1Width = fm.stringWidth(w1);
+        g2D.drawString(w1, 120 + 25 - w1Width / 2, 200);
+
+// Draw wheel2 centered
+        String w2 = String.valueOf(wheel2);
+        int w2Width = fm.stringWidth(w2);
+        g2D.drawString(w2, 270 + 25 - w2Width / 2, 200);
+
+// Draw wheel3 centered
+        String w3 = String.valueOf(wheel3);
+        int w3Width = fm.stringWidth(w3);
+        g2D.drawString(w3, 420 + 25 - w3Width / 2, 200);
+
 
         // --- PEG BOARD ---
         int startX = 60;
         int startY = 450;
-        int cols = 13;
+        int cols = 9;
         int spacing = 60;
         int pegRadius = 20;
         pegPositions.clear();
@@ -140,8 +154,8 @@ public class ManualWheelAndPegBoard extends JPanel implements MouseListener {
             g2D.drawOval(x - pegRadius, y - pegRadius, pegRadius * 2, pegRadius * 2);
 
             g2D.setFont(new Font("SansSerif", Font.BOLD, 16));
-            FontMetrics fm = g2D.getFontMetrics();
-            int textWidth = fm.stringWidth("" + letter);
+            FontMetrics Fm = g2D.getFontMetrics();
+            int textWidth = Fm.stringWidth("" + letter);
             g2D.drawString("" + letter, x - textWidth / 2, y + 5);
         }
 
