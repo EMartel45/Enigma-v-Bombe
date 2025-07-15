@@ -1,30 +1,24 @@
 import java.util.ArrayList;
-import java.util.List; 
 
 public class MessageFind {
-    public static int[] findMessage(char[] enigmaArray, char[] guessMessage) {
-        List<Integer> resultList = new ArrayList<>(); 
-        
-        for (int i = 0; i <= enigmaArray.length - guessMessage.length; i++) {
-            boolean hasCommonChar = false; 
+    public static ArrayList<String> analyzeAll(String cipherText, String guessMessage) {
+        ArrayList<String> validMatches = new ArrayList<>();
+        int cipherLen = cipherText.length();
+        int guessLen = guessMessage.length();
 
-            for (int j = 0; j < guessMessage.length; j++) {
-                if (enigmaArray[i + j] == guessMessage[j]) {
-                    hasCommonChar = true; 
-                    break; 
+        for (int i = 0; i <= cipherLen - guessLen; i++) {
+            boolean valid = true;
+            for (int j = 0; j < guessLen; j++) {
+                if (cipherText.charAt(i + j) == guessMessage.charAt(j)) {
+                    valid = false;
+                    break;
                 }
             }
-            if (!hasCommonChar) {
-                resultList.add(i); 
-            } 
+            if (valid) {
+                validMatches.add(cipherText.substring(i, i + guessLen));
+            }
         }
 
-        // Convert to int[]
-        int[] result = new int[resultList.size()]; 
-        for (int i = 0; i < resultList.size(); i++) {
-            result[i] = resultList.get(i); 
-        }
-
-        return result;
+        return validMatches;
     }
 }
