@@ -18,7 +18,7 @@ public class Bombe {
         ArrayList<String> possibleMatches = MessageFind.analyzeAll(cipherText, guessMessage);
 
         if (possibleMatches.isEmpty()) {
-            System.out.println("❌ No valid placements found in cipherText.");
+            System.out.println("No valid placements found in cipherText.");
             return;
         }
 
@@ -26,7 +26,7 @@ public class Bombe {
             System.out.println("Connected to database.");
 
             for (String subMessage : possibleMatches) {
-                System.out.println("🔍 Trying placement: " + subMessage);
+                System.out.println("Trying placement: " + subMessage);
 
                 for (int a = 0; a < 26; a++) {
                     for (int b = 0; b < 26; b++) {
@@ -57,7 +57,7 @@ public class Bombe {
                             }
 
                             if (match) {
-                                System.out.println("✅ MATCH FOUND!");
+                                System.out.println("MATCH FOUND!");
                                 System.out.println("Rotor Settings: A=" + a + ", B=" + b + ", C=" + c);
                                 System.out.println("Decrypted Section: " + guessMessage);
                                 return;
@@ -67,7 +67,7 @@ public class Bombe {
                 }
             }
 
-            System.out.println("❌ No rotor settings produced a match.");
+            System.out.println("No rotor settings produced a match.");
 
         } catch (Exception e) {
             System.err.println("Error during Bombe execution:");
