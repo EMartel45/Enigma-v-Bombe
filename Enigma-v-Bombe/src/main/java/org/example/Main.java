@@ -1,6 +1,10 @@
 package org.example;
+import javax.swing.*;
 import java.sql.*;
 import java.util.Scanner;
+
+
+
 
 public class Main {
 
@@ -121,6 +125,34 @@ public class Main {
 
     }
 
+
+    public static int[] GuiFunction(){
+        int[] encryptionarray = new int[] {1, 1, 1};
+        JFrame frame = new JFrame("Manual Wheel + Peg Board");
+        ManualWheelAndPegBoard panel = new ManualWheelAndPegBoard(encryptionarray, frame);
+        frame.add(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(650, 750);
+        frame.setVisible(true);
+
+        // Wait for OK button to be pressed
+        while (frame.isDisplayable() && !panel.isOkPressed()) {
+            try {
+                Thread.sleep(100); // Small delay to prevent busy waiting
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        // Get the final wheel values
+        int[] finalValues = panel.getWheelValues();
+        System.out.println("Final wheel values: " + finalValues[0] + ", " + finalValues[1] + ", " + finalValues[2]);
+        return finalValues;
+    }
+
+
+
     public static void main(String[] args) {
         String url = "jdbc:sqlite:my_databaseB.db";
 
@@ -133,18 +165,24 @@ public class Main {
             return;
         }
 
+
+        //TEST SECTION
+        int[] encryptionarray = GuiFunction();
+
+        // END TEST SECTION
+
+
         Scanner myObj = new Scanner(System.in);  // Create a Scanner object
         System.out.println("Enter the message to be encoded:");
         String temp = myObj.nextLine();  // Read user input
 
-
         char[] tempArray = temp.toCharArray();
 
-        int positionA = 23;
-        int positionB = 1;
-        int positionC = 1;
+      //  int positionA = 23;
+      //  int positionB = 1;
+      //  int positionC = 1;
 
-        int[] encryptionarray = {positionA, positionB, positionC};
+        //int[] encryptionarray = {positionA, positionB, positionC};
         //new array based on length of the user input changed into an array of characters.
         char[] encrypted = new char[tempArray.length];
 
@@ -207,4 +245,8 @@ public class Main {
         String finalEncrypt = String.valueOf(encrypted);
         System.out.printf("\nThe test input was '%s' and the encrypted result is '%s'", temp, finalEncrypt);
     }
+    //TEST STUFF HERE
+
 }
+
+
