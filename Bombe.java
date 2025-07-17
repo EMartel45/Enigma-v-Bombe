@@ -12,7 +12,8 @@ public class Bombe {
         System.out.println("Enter the Enigma-encrypted message:");
         String cipherText = scanner.nextLine().toLowerCase();
 
-        String guessMessage = "awaitfurtherorders";
+        Time t = new Time();
+        String guessMessage = t.messageGuess();
         System.out.println("Trying guess message: " + guessMessage);
 
         ArrayList<String> possibleMatches = MessageFind.analyzeAll(cipherText, guessMessage);
