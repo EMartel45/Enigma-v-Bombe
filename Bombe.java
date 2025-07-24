@@ -1,21 +1,31 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.File;
 
 public class Bombe {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         String url = "jdbc:sqlite:my_databaseB.db";
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Enter the Enigma-encrypted message:");
         String cipherText = scanner.nextLine().toLowerCase();
 
-        Time t = new Time();
-        String guessMessage = t.messageGuess();
-        System.out.println("Trying guess message: " + guessMessage);
+        // Load guess message from file
+        String guessMessage = "";
+        try (Scanner scanner1 = new Scanner(new File("guess_message.txt"))) {
+            if (scanner1.hasNextLine()) {
+                guessMessage = scanner1.nextLine().trim();
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to read guess message: " + e.getMessage());
+            return;
+        }
 
+        // Get possible placements in cipherText where guess message could go
         ArrayList<String> possibleMatches = MessageFind.analyzeAll(cipherText, guessMessage);
 
         if (possibleMatches.isEmpty()) {
@@ -23,6 +33,7 @@ public class Bombe {
             return;
         }
 
+        // Connect to SQLite database
         try (Connection conn = DriverManager.getConnection(url)) {
             System.out.println("Connected to database.");
 
@@ -35,15 +46,20 @@ public class Bombe {
                             int[] rotors = { a, b, c };
                             boolean match = true;
 
+                            // Try decrypting the guessMessage and comparing to subMessage
                             for (int j = 0; j < guessMessage.length(); j++) {
-                                char encryptedChar = Main.ascii_encryption(guessMessage.charAt(j), rotors.clone(),
-                                        conn);
+                                char guessChar = guessMessage.charAt(j);
 
+                                // Encrypt the guess character using current rotor settings
+                                char encryptedChar = MessageFind.ascii_encryption(guessChar, rotors, conn);
+
+                                // Compare to the encrypted subMessage from original message
                                 if (encryptedChar != subMessage.charAt(j)) {
                                     match = false;
                                     break;
                                 }
 
+                                // Advance rotor A (like real Enigma)
                                 rotors[0]++;
                                 if (rotors[0] > 25) {
                                     rotors[0] = 0;
@@ -51,14 +67,15 @@ public class Bombe {
                                     if (rotors[1] > 25) {
                                         rotors[1] = 0;
                                         rotors[2]++;
-                                        if (rotors[2] > 25)
+                                        if (rotors[2] > 25) {
                                             rotors[2] = 0;
+                                        }
                                     }
                                 }
                             }
 
                             if (match) {
-                                System.out.println("MATCH FOUND!");
+                                System.out.println("\nMATCH FOUND!");
                                 System.out.println("Rotor Settings: A=" + a + ", B=" + b + ", C=" + c);
                                 System.out.println("Decrypted Section: " + guessMessage);
                                 return;
@@ -70,8 +87,8 @@ public class Bombe {
 
             System.out.println("No rotor settings produced a match.");
 
-        } catch (Exception e) {
-            System.err.println("Error during Bombe execution:");
+        } catch (SQLException e) {
+            System.err.println("Database error:");
             e.printStackTrace();
         }
     }
