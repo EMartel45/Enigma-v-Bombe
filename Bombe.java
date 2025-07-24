@@ -14,16 +14,20 @@ public class Bombe {
         System.out.println("Enter the Enigma-encrypted message:");
         String cipherText = scanner.nextLine().toLowerCase();
 
+        Time t = new Time();
+        String guessMessage = t.messageGuess();
+        System.out.println("Trying guess message: " + guessMessage);
+
         // Load guess message from file
-        String guessMessage = "";
-        try (Scanner scanner1 = new Scanner(new File("guess_message.txt"))) {
-            if (scanner1.hasNextLine()) {
-                guessMessage = scanner1.nextLine().trim();
-            }
-        } catch (Exception e) {
-            System.err.println("Failed to read guess message: " + e.getMessage());
-            return;
-        }
+        // String guessMessage = "";
+        // try (Scanner scanner1 = new Scanner(new File("guess_message.txt"))) {
+        //     if (scanner1.hasNextLine()) {
+        //         guessMessage = scanner1.nextLine().trim();
+        //     }
+        // } catch (Exception e) {
+        //     System.err.println("Failed to read guess message: " + e.getMessage());
+        //     return;
+        // }
 
         // Get possible placements in cipherText where guess message could go
         ArrayList<String> possibleMatches = MessageFind.analyzeAll(cipherText, guessMessage);
